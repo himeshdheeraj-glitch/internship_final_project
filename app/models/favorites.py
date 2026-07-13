@@ -1,0 +1,28 @@
+from __future__ import annotations
+import uuid
+from typing import TYPE_CHECKING
+
+from sqlalchemy import ForeignKey, UniqueConstraint
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from app.database.base import Base, UUIDPrimaryKeyMixin, TimestampMixin
+if TYPE_CHECKING:
+    from app.models.users import User
+    from app.models.properties import Property
+    
+class Favorite(Base, UUIDPrimaryKeyMixin, TimestampMixin):
+    __tablename__ = "favorites"
+
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    property_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("properties.id", ondelete="CASCADE"), nullable=False
+    )
+
+    __table_args__ = (
+        UniqueConstraint("user_id", "property_id", name="uq_favorites_user_property"),
+    )
+
+    user: Mapped["User"] = relationship("User", back_populates="favorites")
+    property: Mapped["Property"] = relationship("Property", back_populates="favorites")

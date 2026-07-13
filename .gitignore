@@ -1,0 +1,53 @@
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.log
+
+# Virtual Environment
+.venv/
+venv/
+env/
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Databases (SQLite / Local dumps)
+*.db
+*.sqlite
+*.sqlite3
+*.sql
+
+# IDE
+.vscode/
+.idea/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Build Files
+build/
+dist/
+*.egg-info/
+
+# React / Node
+node_modules/
+frontend/node_modules/
+frontend/dist/
+
+# Logs
+logs/
+
+# Uploads
+app/uploads/
+app/static/uploads/
+
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
