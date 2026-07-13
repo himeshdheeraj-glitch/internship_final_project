@@ -1,146 +1,205 @@
-🏡 Real Estate Property Listing Application
+# 🏡 Real Estate Property Listing Application
 
-A full-stack Real Estate Property Listing Application built using FastAPI, React, PostgreSQL, Docker, and JWT Authentication.
+A full-stack **Real Estate Property Listing Application** built using **FastAPI, React, PostgreSQL, Docker, and JWT Authentication**.
 
-The application allows users to browse, search, and manage real estate properties. It supports secure authentication, role-based access control, property management, favorites, reviews, and an intuitive React frontend.
+The application allows users to browse, search, and manage real estate properties. It provides secure authentication, role-based access control, property management, favorites, reviews, amenities, notifications, and a responsive React frontend.
 
-Tech Stack Used
-Backend
-Python
-FastAPI
-PostgreSQL
-SQLAlchemy Async
-AsyncPG
-Pydantic
-Uvicorn
-Alembic
-JWT Authentication
-Frontend
-React
-Vite
-Axios
-CSS
-Database
-PostgreSQL
-Tools
-Docker
-Docker Compose
-pgAdmin
-Postman
-Git & GitHub
-VS Code
-Features
-User Authentication
+---
 
-The authentication module supports:
+# 📌 Table of Contents
 
-User Registration
-User Login
-JWT Access Token
-Refresh Token
-Secure Password Hashing
-Role-Based Authorization
+- Features
+- Tech Stack
+- Project Structure
+- Project Setup
+- Backend Setup
+- Frontend Setup
+- API Documentation
+- API Modules
+- Database
+- Useful Commands
+- Future Improvements
+- Author
 
-Supported roles:
+---
 
-Admin
-Seller
-Buyer
-Property Management
+# ✨ Features
+
+## 🔐 User Authentication
+
+- User Registration
+- User Login
+- JWT Authentication
+- Access Token & Refresh Token
+- Password Hashing
+- Role-Based Authorization
+
+### Supported Roles
+
+- 👑 Admin
+- 🏠 Seller
+- 👤 Buyer
+
+---
+
+## 🏡 Property Management
 
 Users can:
 
-Create Property Listings
-View All Properties
-View Property Details
-Update Property Listings
-Delete Property Listings
+- Create Property Listings
+- View All Properties
+- View Property Details
+- Update Property Listings
+- Delete Property Listings
 
 Each property contains:
 
-Title
-Description
-Property Type
-Purpose (Sale/Rent)
-Price
-Area
-Bedrooms
-Bathrooms
-Furnishing Status
-Parking Availability
-Property Images
-Amenities
-Address
-City
-State
-Country
-ZIP Code
-Agent Details
+- Title
+- Description
+- Property Type
+- Purpose (Sale/Rent)
+- Price
+- Area (sqft)
+- Bedrooms
+- Bathrooms
+- Furnishing Status
+- Parking Availability
+- Property Images
+- Amenities
+- Country
+- State
+- City
+- Address
+- ZIP Code
+- Agent Details
 
 Property IDs are generated using UUID.
 
-Property Search & Filtering
+---
 
-Users can search properties based on:
+## 🔍 Property Search & Filtering
 
-Location
-Property Type
-Price Range
-Bedrooms
-Bathrooms
-Furnishing Status
-Favorites
+Users can search properties using:
+
+- Property Type
+- Price Range
+- Location
+- Bedrooms
+- Bathrooms
+- Furnishing Status
+
+---
+
+## ❤️ Favorites
 
 Registered users can:
 
-Add Property to Favorites
-Remove Property from Favorites
-View Favorite Properties
-Reviews & Ratings
+- Add Property to Favorites
+- Remove Property from Favorites
+- View Favorite Properties
+
+---
+
+## ⭐ Reviews & Ratings
 
 Users can:
 
-Add Reviews
-Update Reviews
-Delete Reviews
-View Property Reviews
-Amenities
+- Add Reviews
+- Update Reviews
+- Delete Reviews
+- View Reviews
 
-The system supports management of amenities such as:
+---
 
-Air Conditioning
-Parking
-Garden
-Swimming Pool
-Security
-Internet
-Gym
-Location Management
+## 🏢 Amenities
+
+Supports management of amenities such as:
+
+- Air Conditioning
+- Parking
+- Garden
+- Swimming Pool
+- Gym
+- Internet
+- Security
+
+---
+
+## 🌍 Location Management
 
 Supports management of:
 
-Countries
-States
-Cities
-Notifications
+- Countries
+- States
+- Cities
 
-The application provides notification support for important user activities.
+---
 
-Frontend
+## 🔔 Notifications
 
-The React frontend provides:
+Provides notification support for important user activities.
 
-Responsive User Interface
-Login & Registration Pages
-Property Listing Page
-Property Details Page
-Favorites Page
-Dashboard
-Property Management Forms
-Search & Filter Functionality
-Project Structure
+---
+
+## 💻 Responsive Frontend
+
+The React frontend includes:
+
+- Home Page
+- Login & Registration
+- Property Listings
+- Property Details
+- Favorites
+- User Dashboard
+- Admin Dashboard
+- Add/Edit Property
+- Search & Filters
+- Responsive UI
+
+---
+
+# 🛠️ Tech Stack
+
+## Backend
+
+- Python
+- FastAPI
+- PostgreSQL
+- SQLAlchemy Async
+- AsyncPG
+- Pydantic
+- Uvicorn
+- Alembic
+- JWT Authentication
+
+## Frontend
+
+- React
+- Vite
+- Axios
+- CSS
+
+## Database
+
+- PostgreSQL
+
+## Tools
+
+- Docker
+- Docker Compose
+- pgAdmin
+- Postman
+- Git
+- GitHub
+- VS Code
+
+---
+
+# 📂 Project Structure
+
+```text
 Real-Estate-Property-Listing-App/
-
+│
 ├── app/
 ├── frontend/
 ├── docker/
@@ -150,229 +209,362 @@ Real-Estate-Property-Listing-App/
 ├── run.py
 ├── README.md
 └── .gitignore
-Project Setup
-1. Clone Repository
+```
+
+---
+
+# 🚀 Project Setup
+
+## 1️⃣ Clone Repository
+
+```bash
 git clone https://github.com/bhavanibapani-30/Real-Estate-property-listing-app.git
+```
 
-Move into the project folder:
+Move into the project folder.
 
+```bash
 cd Real-Estate-property-listing-app
-2. Create Virtual Environment
+```
+
+---
+
+## 2️⃣ Create Virtual Environment
+
+```bash
 python -m venv .venv
+```
 
-Activate virtual environment.
+### Windows
 
-Windows:
-
+```bash
 .venv\Scripts\activate
+```
 
-Linux/Mac:
+### Linux / macOS
 
+```bash
 source .venv/bin/activate
-3. Install Backend Dependencies
+```
+
+---
+
+## 3️⃣ Install Backend Dependencies
+
+```bash
 pip install -r requirements.txt
-4. Create Environment File
+```
 
-Create a .env file in the project root.
+---
 
-Example variables:
+## 4️⃣ Create Environment File
 
+Create a `.env` file inside the project root.
+
+Example:
+
+```env
 DATABASE_URL=
 JWT_SECRET_KEY=
 ACCESS_TOKEN_EXPIRE_MINUTES=
 REFRESH_TOKEN_EXPIRE_DAYS=
+```
 
-Do not push the .env file to GitHub.
+⚠️ Never commit your `.env` file to GitHub.
 
-PostgreSQL Docker Setup
+---
 
-PostgreSQL runs using Docker Compose.
+# 🐳 PostgreSQL Docker Setup
 
-Start Docker containers:
+Navigate to the docker folder.
 
+```bash
 cd docker
+```
+
+Start Docker containers.
+
+```bash
 docker compose start
+```
 
-Verify containers:
+Verify running containers.
 
+```bash
 docker ps
-Run the Backend
+```
 
-Return to the project root:
+---
 
+# ▶️ Run Backend
+
+Return to the project root.
+
+```bash
 cd ..
+```
 
-Run FastAPI:
+Run the backend.
 
+```bash
 python run.py
+```
 
 Backend runs at:
 
+```
 http://localhost:8000
+```
 
 Swagger Documentation:
 
+```
 http://localhost:8000/docs
-Run the Frontend
+```
 
-Open another terminal.
+ReDoc:
 
-Navigate to the frontend folder:
+```
+http://localhost:8000/redoc
+```
 
+---
+
+# 💻 Run Frontend
+
+Open a new terminal.
+
+Navigate to the frontend folder.
+
+```bash
 cd frontend
+```
 
-Install packages (first time only):
+Install dependencies (first time only).
 
+```bash
 npm install
+```
 
-Run React application:
+Run React.
 
+```bash
 npm run dev
+```
 
 Frontend runs at:
 
+```
 http://localhost:3000
-Project Startup Order
-Step 1
+```
 
-Start PostgreSQL
+---
 
+# ▶️ Project Startup Order
+
+### Step 1
+
+Start PostgreSQL.
+
+```bash
 cd docker
 docker compose start
 docker ps
-Step 2
+```
 
-Run Backend
+---
 
+### Step 2
+
+Run Backend.
+
+```bash
 cd ..
 python run.py
-Step 3
+```
 
-Open another terminal.
+---
 
-Step 4
+### Step 3
 
-Run Frontend
+Open a new terminal.
 
+---
+
+### Step 4
+
+Run Frontend.
+
+```bash
 cd frontend
 npm install
 npm run dev
-API Documentation
+```
 
-Swagger UI
+---
 
+# 📖 API Documentation
+
+### Swagger UI
+
+```
 http://localhost:8000/docs
+```
 
-ReDoc
+### ReDoc
 
+```
 http://localhost:8000/redoc
-API Modules
+```
+
+---
+
+# 📡 API Modules
 
 The backend provides REST APIs for:
 
-Authentication
-Users
-Properties
-Amenities
-Favorites
-Reviews
-Notifications
-Locations
-Admin
+- Authentication
+- Users
+- Properties
+- Amenities
+- Favorites
+- Reviews
+- Notifications
+- Locations
+- Admin
 
 All APIs can be tested using:
 
-Swagger UI
-Postman
-pgAdmin Connection
+- Swagger UI
+- Postman
 
-Use pgAdmin to manage PostgreSQL.
+---
+
+# 🗄️ Database
+
+Database used:
+
+- PostgreSQL
+
+Database Management Tool:
+
+- pgAdmin
 
 Example connection:
 
-Host:
+| Field | Value |
+|-------|-------|
+| Host | localhost |
+| Port | 5432 |
+| Database | Your Database Name |
+| Username | Your PostgreSQL Username |
+| Password | Your PostgreSQL Password |
 
-localhost
+---
 
-Port:
+# 🧰 Useful Commands
 
-5432
+### Start Docker
 
-Database:
-
-(Your database name)
-
-Username:
-
-(Your PostgreSQL username)
-
-Password:
-
-(Your PostgreSQL password)
-Useful Commands
-
-Start Docker
-
+```bash
 docker compose start
+```
 
-View Running Containers
+### Stop Docker
 
-docker ps
-
-Stop Containers
-
+```bash
 docker compose stop
+```
 
-Reset Database
+### Check Running Containers
 
+```bash
+docker ps
+```
+
+### Reset Database
+
+```bash
 docker compose down -v
+```
 
-Run Backend
+### Run Backend
 
+```bash
 python run.py
+```
 
-Run Frontend
+### Run Frontend
 
+```bash
 cd frontend
 npm run dev
+```
 
-Save Python Packages
+### Save Dependencies
 
+```bash
 pip freeze > requirements.txt
-Git Ignore
+```
+
+---
+
+# 📁 Git Ignore
 
 The project ignores:
 
-.env
-.venv
-__pycache__
-node_modules
-Python cache files
-IDE settings
+- `.env`
+- `.venv`
+- `__pycache__/`
+- `node_modules/`
+- IDE settings
+- Python cache files
 
 Never commit environment variables or secrets to GitHub.
 
-Future Improvements
-Property Recommendation System
-Google Maps Integration
-Email Notifications
-Payment Integration
-Property Analytics Dashboard
-Advanced Search Filters
-Image Optimization
-Deployment to Cloud
-Summary
+---
 
-This project demonstrates a modern full-stack real estate application using:
+# 🚀 Future Improvements
 
-FastAPI
-React
-PostgreSQL
-Docker
-Async SQLAlchemy
-JWT Authentication
-REST APIs
-CRUD Operations
-Role-Based Access Control
+- Google Maps Integration
+- Property Recommendation System
+- Email Notifications
+- Property Analytics Dashboard
+- Payment Integration
+- Image Optimization
+- Advanced Search Filters
+- Cloud Deployment
+
+---
+
+# 👩‍💻 Author
+
+**Bhavani Bapani**
+
+GitHub:
+
+https://github.com/bhavanibapani-30
+
+---
+
+# 📄 License
+
+This project is developed for learning and educational purposes.
+
+---
+
+# 📌 Summary
+
+This project demonstrates a modern full-stack Real Estate Property Listing Application using:
+
+- FastAPI
+- React
+- PostgreSQL
+- Docker
+- Async SQLAlchemy
+- JWT Authentication
+- REST APIs
+- CRUD Operations
+- Role-Based Access Control
 
 It serves as a foundation for building scalable real estate management systems.
