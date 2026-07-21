@@ -106,7 +106,6 @@ const RegisterForm = ({ onSubmit, loading = false }) => {
         >
           <option value="buyer">Buyer (Search & Save Properties)</option>
           <option value="agent">Agent (Publish & Manage Listings)</option>
-          <option value="seller">Seller (Publish & Manage Listings)</option>
           <option value="admin">Admin (Platform Manager)</option>
         </select>
         {errors.role && <span className="text-xs text-rose-500">{errors.role.message}</span>}

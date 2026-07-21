@@ -18,7 +18,7 @@ class FavoriteService:
             
         fav = await favorite_repository.create(db, obj_in={"user_id": user_id, "property_id": property_id})
         await auth_repository.create_audit_log(db, user_id=user_id, action="add_favorite", table_name="favorites", record_id=fav.id)
-        return fav
+        return await favorite_repository.get_favorite_with_property(db, user_id, property_id)
 
     async def remove_favorite(self, db: AsyncSession, *, property_id: uuid.UUID, user_id: uuid.UUID) -> None:
         fav = await favorite_repository.get_favorite(db, user_id, property_id)

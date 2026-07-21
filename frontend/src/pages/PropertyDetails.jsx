@@ -5,20 +5,36 @@ import { useFavorites } from '../context/FavoriteContext';
 import PropertyGallery from '../components/Property/PropertyGallery';
 import PropertyFeatures from '../components/Property/PropertyFeatures';
 import PropertyReviews from '../components/Property/PropertyReviews';
+import { useAuth } from '../context/AuthContext';
 import { Heart, MapPin, Phone, Mail, ChevronLeft, ArrowLeft } from 'lucide-react';
 
 const PropertyDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toggleFavorite, isFavorite } = useFavorites();
+  const { user } = useAuth();
   const isFav = isFavorite(id);
 
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const [agentForm, setAgentForm] = useState({ name: '', email: '', message: "I'm interested in viewing this property." });
+  const [agentForm, setAgentForm] = useState({ 
+    name: user ? `${user.first_name} ${user.last_name}` : '', 
+    email: user ? user.email : '', 
+    message: "I'm interested in viewing this property." 
+  });
   const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setAgentForm(prev => ({
+        ...prev,
+        name: `${user.first_name} ${user.last_name}`,
+        email: user.email
+      }));
+    }
+  }, [user]);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -45,10 +61,35 @@ const PropertyDetails = () => {
   const handleEnquiry = (e) => {
     e.preventDefault();
     setSubmitted(true);
+
+    const newInquiry = {
+      id: Math.random().toString(36).substring(2, 9),
+      property_id: property.id,
+      property_title: property.title,
+      property_address: property.address,
+      buyer_id: user?.id || null,
+      buyer_name: agentForm.name,
+      buyer_email: agentForm.email,
+      agent_id: property.owner_id || property.owner?.id || null,
+      agent_name: property.agent_name || (property.owner?.first_name ? `${property.owner.first_name} ${property.owner.last_name}` : 'Verified Agent'),
+      agent_email: property.agent_email || property.owner?.email || 'agent@estatehub.com',
+      message: agentForm.message,
+      created_at: new Date().toISOString()
+    };
+
+    const existing = localStorage.getItem('inquiries');
+    const list = existing ? JSON.parse(existing) : [];
+    list.unshift(newInquiry);
+    localStorage.setItem('inquiries', JSON.stringify(list));
+
     setTimeout(() => {
-      alert('Your request has been sent to the agent!');
+      alert('Your request has been sent to the agent! You can track this inquiry in your dashboard.');
       setSubmitted(false);
-      setAgentForm({ name: '', email: '', message: '' });
+      setAgentForm({ 
+        name: user ? `${user.first_name} ${user.last_name}` : '', 
+        email: user ? user.email : '', 
+        message: "I'm interested in viewing this property." 
+      });
     }, 1000);
   };
 
@@ -90,9 +131,23 @@ const PropertyDetails = () => {
           
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl space-y-4 shadow-sm">
             <div className="flex justify-between items-start gap-4">
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white">{property.title}</h1>
-                <p className="flex items-center gap-1 text-slate-500 dark:text-slate-400 text-sm mt-1">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-3">
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white truncate">{property.title}</h1>
+                  <button
+                    onClick={() => toggleFavorite(property.id)}
+                    className={`p-2 rounded-full border transition-all cursor-pointer ${
+                      isFav 
+                        ? 'bg-rose-500 text-white border-rose-500 hover:bg-rose-600 shadow-md shadow-rose-200' 
+                        : 'bg-slate-100 hover:bg-slate-200 text-slate-600 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700 hover:text-rose-500'
+                    }`}
+                    aria-label={isFav ? 'Remove from favorites' : 'Add to favorites'}
+                    title={isFav ? 'Remove from favorites' : 'Add to favorites'}
+                  >
+                    <Heart className={`h-5 w-5 ${isFav ? 'fill-current' : ''}`} />
+                  </button>
+                </div>
+                <p className="flex items-center gap-1 text-slate-500 dark:text-slate-400 text-sm mt-1.5">
                   <MapPin className="h-4 w-4 text-indigo-500" />
                   <span>{property.address}, {property.city?.name || 'Local Area'}</span>
                 </p>
@@ -175,7 +230,7 @@ const PropertyDetails = () => {
                 />
               </div>
 
-              <button type="submit" className="w-full py-2.5 bg-indigo-650 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm shadow-md cursor-pointer transition-colors">
+              <button type="submit" disabled={submitted} className="w-full py-2.5 bg-indigo-650 hover:bg-indigo-700 disabled:opacity-50 text-white font-bold rounded-xl text-sm shadow-md cursor-pointer transition-colors">
                 {submitted ? 'Sending Request...' : 'Send Message'}
               </button>
             </form>

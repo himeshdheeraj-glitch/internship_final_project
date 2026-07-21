@@ -31,6 +31,19 @@ const PropertyListing = () => {
         ...prev,
         ...location.state.searchParams,
       }));
+    } else {
+      setFilters({
+        city_id: undefined,
+        property_type_id: undefined,
+        min_price: undefined,
+        max_price: undefined,
+        bedrooms: undefined,
+        bathrooms: undefined,
+        search_query: '',
+        purpose: undefined,
+        parking: undefined,
+        furnishing_status: undefined
+      });
     }
   }, [location.state]);
 
@@ -82,9 +95,12 @@ const PropertyListing = () => {
         <p className="text-slate-500 dark:text-slate-400 text-sm">Discover verified luxury estates, apartments, and land plots.</p>
       </div>
 
-      <div className="w-full max-w-4xl">
-        <SearchBar onSearch={(q) => { setFilters(prev => ({ ...prev, ...q })); setPage(1); }} initialQuery={filters.search_query} />
-      </div>
+        <SearchBar 
+          onSearch={(q) => { setFilters(prev => ({ ...prev, ...q })); setPage(1); }} 
+          initialQuery={filters.search_query} 
+          initialMinPrice={filters.min_price}
+          initialMaxPrice={filters.max_price}
+        />
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
         <div className="lg:col-span-1">

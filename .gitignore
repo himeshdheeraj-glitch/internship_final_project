@@ -51,3 +51,6 @@ app/static/uploads/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Local DB Data
+postgres_data/

@@ -17,7 +17,7 @@ const Navbar = () => {
     navigate('/');
   };
 
-  const isAgentOrAdmin = user && ['agent', 'seller', 'admin'].includes(user.role);
+  const isAgentOrAdmin = user && ['agent', 'admin'].includes(user.role);
 
   return (
     <nav className="sticky top-0 z-50 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 shadow-sm transition-colors duration-300">
@@ -54,7 +54,7 @@ const Navbar = () => {
               >
                 Browse Properties
               </NavLink>
-              {isAgentOrAdmin && (
+              {isAuthenticated && (
                 <NavLink
                   to="/dashboard"
                   className={({ isActive }) =>
@@ -170,23 +170,23 @@ const Navbar = () => {
           >
             Browse Properties
           </Link>
+          {isAuthenticated && (
+            <Link
+              to="/dashboard"
+              onClick={() => setIsOpen(false)}
+              className="block px-3 py-2 rounded-lg text-base font-semibold text-slate-705 dark:text-slate-300 hover:text-indigo-605"
+            >
+              Dashboard
+            </Link>
+          )}
           {isAgentOrAdmin && (
-            <>
-              <Link
-                to="/dashboard"
-                onClick={() => setIsOpen(false)}
-                className="block px-3 py-2 rounded-lg text-base font-semibold text-slate-700 dark:text-slate-300 hover:text-indigo-605"
-              >
-                Dashboard
-              </Link>
-              <Link
-                to="/dashboard/properties/new"
-                onClick={() => setIsOpen(false)}
-                className="block px-3 py-2 rounded-lg text-base font-semibold text-slate-700 dark:text-slate-300 hover:text-indigo-605"
-              >
-                List Property
-              </Link>
-            </>
+            <Link
+              to="/dashboard/properties/new"
+              onClick={() => setIsOpen(false)}
+              className="block px-3 py-2 rounded-lg text-base font-semibold text-slate-705 dark:text-slate-300 hover:text-indigo-605"
+            >
+              List Property
+            </Link>
           )}
           <hr className="border-slate-100 dark:border-slate-800 my-2" />
           {isAuthenticated ? (

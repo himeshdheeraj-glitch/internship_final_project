@@ -22,6 +22,25 @@ class FavoriteRepository(BaseRepository[Favorite]):
         result = await db.execute(query)
         return result.scalars().first()
 
+    async def get_favorite_with_property(self, db: AsyncSession, user_id: uuid.UUID, property_id: uuid.UUID) -> Optional[Favorite]:
+        query = (
+            select(Favorite)
+            .where(Favorite.user_id == user_id, Favorite.property_id == property_id)
+            .options(
+                selectinload(Favorite.property).options(
+                    selectinload(Property.city).selectinload(City.state).selectinload(State.country),
+                    selectinload(Property.property_type),
+                    selectinload(Property.owner).selectinload(User.role),
+                    selectinload(Property.images)
+                )
+            )
+        )
+        result = await db.execute(query)
+        fav = result.scalars().first()
+        if fav and fav.property:
+            fav.property.amenities = []
+        return fav
+
     async def is_favorite(self, db: AsyncSession, user_id: uuid.UUID, property_id: uuid.UUID) -> bool:
         fav = await self.get_favorite(db, user_id, property_id)
         return fav is not None
@@ -34,7 +53,7 @@ class FavoriteRepository(BaseRepository[Favorite]):
             .where(Favorite.user_id == user_id)
             .options(
                 selectinload(Favorite.property).options(
-                    selectinload(Property.city).selectinload(City.state),
+                    selectinload(Property.city).selectinload(City.state).selectinload(State.country),
                     selectinload(Property.property_type),
                     selectinload(Property.owner).selectinload(User.role),
                     selectinload(Property.images)

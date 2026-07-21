@@ -193,11 +193,33 @@ export const authService = {
 
 export const adminService = {
   getUsers: async (params) => {
-    const res = await api.get('/users', { params });
+    const res = await api.get('/admin/users', { params });
     return res.data.data;
   },
-  updateUserRole: async (userId, roleId) => {
-    const res = await api.put(`/users/${userId}/role`, { role_id: roleId });
+  updateUserRole: async (userId, roleName) => {
+    const res = await api.put(`/admin/users/${userId}/role`, { role_name: roleName });
+    return res.data.data;
+  },
+  deactivateUser: async (userId) => {
+    const res = await api.post(`/admin/users/${userId}/deactivate`);
+    return res.data.data;
+  },
+  deleteUser: async (userId) => {
+    const res = await api.delete(`/admin/users/${userId}`);
+    return res.data.data;
+  },
+  getAdminProperties: async (params = {}) => {
+    const res = await api.get('/admin/properties', { params });
+    return res.data.data;
+  },
+  updatePropertyStatus: async (propertyId, statusVal) => {
+    const res = await api.put(`/admin/properties/${propertyId}/status`, null, {
+      params: { status_val: statusVal }
+    });
+    return res.data.data;
+  },
+  getDashboardAnalytics: async () => {
+    const res = await api.get('/admin/analytics/dashboard');
     return res.data.data;
   }
 };

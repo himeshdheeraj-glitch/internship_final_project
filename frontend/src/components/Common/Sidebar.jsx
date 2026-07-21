@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Home, Landmark, Users, LayoutDashboard, Settings, LogOut, ShieldCheck, MapPin, Grid } from 'lucide-react';
+import { Home, Landmark, Users, LayoutDashboard, Settings, LogOut, ShieldCheck, MapPin, Grid, Heart, Search } from 'lucide-react';
 
 const Sidebar = () => {
   const { user, logout } = useAuth();
@@ -13,7 +13,8 @@ const Sidebar = () => {
   };
 
   const isAdmin = user && user.role === 'admin';
-  const isAgentOrSeller = user && ['agent', 'seller'].includes(user.role);
+  const isAgent = user && user.role === 'agent';
+  const isBuyer = user && user.role === 'buyer';
 
   return (
     <div className="w-64 bg-slate-900 border-r border-slate-800 text-slate-350 flex flex-col h-full">
@@ -44,7 +45,34 @@ const Sidebar = () => {
           <span>Overview</span>
         </NavLink>
 
-        {isAgentOrSeller && (
+        {isBuyer && (
+          <>
+            <NavLink
+              to="/favorites"
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                  isActive ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/10' : 'hover:bg-slate-800 hover:text-white'
+                }`
+              }
+            >
+              <Heart className="h-4.5 w-4.5" />
+              <span>My Favorites</span>
+            </NavLink>
+            <NavLink
+              to="/properties"
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                  isActive ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/10' : 'hover:bg-slate-800 hover:text-white'
+                }`
+              }
+            >
+              <Search className="h-4.5 w-4.5" />
+              <span>Browse Listings</span>
+            </NavLink>
+          </>
+        )}
+
+        {isAgent && (
           <NavLink
             to="/dashboard"
             className={({ isActive }) =>
@@ -58,7 +86,7 @@ const Sidebar = () => {
           </NavLink>
         )}
 
-        {(isAdmin || isAgentOrSeller) && (
+        {(isAdmin || isAgent) && (
           <NavLink
             to="/dashboard/locations"
             className={({ isActive }) =>

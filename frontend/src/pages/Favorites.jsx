@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useFavorites } from '../context/FavoriteContext';
-import { favoritesService } from '../services/api';
+import { favoritesService, propertyService } from '../services/api';
 import PropertyGrid from '../components/Property/PropertyGrid';
 import { Heart } from 'lucide-react';
 
@@ -13,20 +13,26 @@ const Favorites = () => {
 
   useEffect(() => {
     const fetchFavoriteDetails = async () => {
-      if (!isAuthenticated) {
-        setProperties([]);
-        setLoading(false);
-        return;
-      }
-
       setLoading(true);
       try {
-        const response = await favoritesService.getFavorites({ page: 1, size: 50 });
-        const favoriteItems = response?.items || [];
-        const favoriteProperties = favoriteItems
-          .map((item) => item.property)
-          .filter(Boolean);
-        setProperties(favoriteProperties);
+        if (isAuthenticated) {
+          const response = await favoritesService.getFavorites({ page: 1, size: 50 });
+          const favoriteItems = response?.items || [];
+          const favoriteProperties = favoriteItems
+            .map((item) => item.property)
+            .filter(Boolean);
+          setProperties(favoriteProperties);
+        } else {
+          const local = localStorage.getItem('favorites');
+          const ids = local ? JSON.parse(local) : [];
+          if (ids.length > 0) {
+            const response = await propertyService.getProperties({ limit: 100 });
+            const allItems = response?.items || response || [];
+            setProperties(allItems.filter(p => ids.includes(p.id)));
+          } else {
+            setProperties([]);
+          }
+        }
       } catch (err) {
         console.error(err);
         setProperties([]);
@@ -35,7 +41,11 @@ const Favorites = () => {
       }
     };
     fetchFavoriteDetails();
-  }, [favorites, isAuthenticated]);
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    setProperties(prev => prev.filter(p => favorites.includes(p.id)));
+  }, [favorites]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">

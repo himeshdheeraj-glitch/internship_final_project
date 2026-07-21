@@ -21,6 +21,7 @@ import Profile from './pages/Profile';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import AgentDashboard from './pages/AgentDashboard';
+import DashboardHome from './pages/DashboardHome';
 import ManageUsers from './pages/ManageUsers';
 import ManageProperties from './pages/ManageProperties';
 import ManageAmenities from './pages/ManageAmenities';
@@ -33,7 +34,7 @@ const ProtectedRoute = ({ allowedRoles = [] }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-955">
         <div className="h-8 w-8 border-4 border-indigo-605 border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -69,7 +70,7 @@ function App() {
                     <Route path="/register" element={<Register />} />
                     
                     {/* Authenticated general consumer profile */}
-                    <Route element={<ProtectedRoute allowedRoles={['buyer', 'agent', 'seller', 'admin']} />}>
+                    <Route element={<ProtectedRoute allowedRoles={['buyer', 'agent', 'admin']} />}>
                       <Route path="/profile" element={<Profile />} />
                     </Route>
 
@@ -79,11 +80,18 @@ function App() {
 
                   {/* Dashboard Layout - Role Protected */}
                   <Route path="/dashboard" element={<DashboardLayout />}>
-                    <Route element={<ProtectedRoute allowedRoles={['agent', 'seller', 'admin']} />}>
-                      <Route index element={<AgentDashboard />} />
+                    {/* Common index dashboard page for all authenticated roles */}
+                    <Route element={<ProtectedRoute allowedRoles={['buyer', 'agent', 'admin']} />}>
+                      <Route index element={<DashboardHome />} />
+                    </Route>
+                    
+                    {/* Agent / Admin listings modification */}
+                    <Route element={<ProtectedRoute allowedRoles={['agent', 'admin']} />}>
                       <Route path="properties/new" element={<AddProperty />} />
                       <Route path="properties/:id/edit" element={<EditProperty />} />
                     </Route>
+
+                    {/* Admin only panels */}
                     <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
                       <Route path="users" element={<ManageUsers />} />
                       <Route path="properties" element={<ManageProperties />} />
