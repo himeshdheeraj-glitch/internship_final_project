@@ -1,8 +1,8 @@
-# 🏡 Real Estate Property Listing Application
+# 🏡 EstateHub - Enterprise Real Estate Property Listing Platform
 
-A full-stack **Real Estate Property Listing Application** built using **FastAPI, React, PostgreSQL, Docker, and JWT Authentication**.
+EstateHub is a modern, high-fidelity full-stack real estate property listing and client-to-agent lead generation platform. Built with **FastAPI, React, PostgreSQL, Docker, and JWT Authentication**, it features a clean responsive interface with theme synchronization (Light/Dark mode) and premium micro-animations.
 
-The application allows users to browse, search, and manage real estate properties. It provides secure authentication, role-based access control, property management, favorites, reviews, amenities, notifications, and a responsive React frontend.
+The application allows users to discover, search, and manage property listings through role-based guards. It handles user authentication, profile updates, rating/review systems, and interactive multi-photo uploads for listings.
 
 ---
 
@@ -37,7 +37,7 @@ The application allows users to browse, search, and manage real estate propertie
 ### Supported Roles
 
 - 👑 Admin
-- 🏠 Seller
+- 💼 Agent
 - 👤 Buyer
 
 ---
@@ -160,28 +160,28 @@ The React frontend includes:
 
 # 🛠️ Tech Stack
 
-## Backend
+## Frontend (Single Page Application)
+- **Framework & UI**: React 19, React DOM
+- **Bundler & Tooling**: Vite 8, PostCSS, Autoprefixer, Oxlint
+- **Routing**: React Router DOM 7
+- **Styling**: Tailwind CSS v4 (with full Light/Dark mode responsiveness)
+- **State Management**: Context API (Auth, Favorites, User, Notifications)
+- **HTTP Client**: Axios (configured with request/response interceptors for JWT Bearer tokens and token refresh)
+- **UX & Graphics**: Framer Motion, Recharts, Swiper, Lucide React
+- **Utility**: Day.js, React Hook Form, Yup
 
-- Python
-- FastAPI
-- PostgreSQL
-- SQLAlchemy Async
-- AsyncPG
-- Pydantic
-- Uvicorn
-- Alembic
-- JWT Authentication
-
-## Frontend
-
-- React
-- Vite
-- Axios
-- CSS
+## Backend (Async RESTful API)
+- **Language**: Python 3.13
+- **Framework**: FastAPI (conforming to OpenAPI and Swagger specifications)
+- **Server**: Uvicorn
+- **ORM & Database Connection**: SQLAlchemy 2.0 (using asyncio sessions and eager loading), AsyncPG
+- **Migrations**: Alembic
+- **Validation**: Pydantic v2, Pydantic Settings
+- **Auth & Cryptography**: PyJWT, Passlib (bcrypt)
+- **Middleware**: CORSMiddleware, custom AuthStateMiddleware, custom RequestLoggerMiddleware
 
 ## Database
-
-- PostgreSQL
+- **Engine**: PostgreSQL (Docker containers)
 
 ## Tools
 
