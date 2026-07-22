@@ -19,7 +19,6 @@ The application allows users to discover, search, and manage property listings t
 - Database
 - Useful Commands
 - Future Improvements
-- Author
 
 ---
 
@@ -535,21 +534,6 @@ Never commit environment variables or secrets to GitHub.
 - Advanced Search Filters
 - Cloud Deployment
 
----
-
-# 👩‍💻 Author
-
-**Bhavani Bapani**
-
-GitHub:
-
-https://github.com/bhavanibapani-30
-
----
-
-# 📄 License
-
-This project is developed for learning and educational purposes.
 
 ---
 
