@@ -12,6 +12,8 @@ const EditProperty = () => {
 
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   useEffect(() => {
     const fetchProperty = async () => {
@@ -29,7 +31,7 @@ const EditProperty = () => {
     fetchProperty();
   }, [id]);
 
-  const handleFormSubmit = async (data) => {
+  const handleFormSubmit = async (data, newFiles) => {
     try {
       const payload = {
         title: data.title,
@@ -55,11 +57,21 @@ const EditProperty = () => {
 
       await propertyService.updateProperty(id, payload);
 
-      if (data.imageFile && data.imageFile.length > 0) {
-        const file = data.imageFile[0];
-        const img = await propertyService.uploadImage(id, file);
-        if (img?.id) {
-          await propertyService.setCoverImage(id, img.id);
+      // Handle Multiple Image Uploads Sequentially
+      if (newFiles && newFiles.length > 0) {
+        setIsUploading(true);
+        setUploadProgress(0);
+        
+        let completed = 0;
+        for (let i = 0; i < newFiles.length; i++) {
+          const file = newFiles[i];
+          await propertyService.uploadImage(id, file, (percent) => {
+            const currentContribution = percent / newFiles.length;
+            const overallPercent = Math.round(((completed / newFiles.length) * 100) + currentContribution);
+            setUploadProgress(overallPercent);
+          });
+          completed++;
+          setUploadProgress(Math.round((completed / newFiles.length) * 100));
         }
       }
 
@@ -67,6 +79,8 @@ const EditProperty = () => {
       navigate('/dashboard');
     } catch (err) {
       showError('Failed to update property details.');
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -91,6 +105,8 @@ const EditProperty = () => {
           onSubmit={handleFormSubmit}
           submitLabel="Save Changes"
           onCancel={() => navigate('/dashboard')}
+          uploadProgress={uploadProgress}
+          isUploading={isUploading}
         />
       </div>
     </div>

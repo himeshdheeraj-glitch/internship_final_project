@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { propertyService } from '../services/api';
 import { useNotifications } from '../context/NotificationContext';
@@ -7,8 +7,10 @@ import PropertyForm from '../components/Property/PropertyForm';
 const AddProperty = () => {
   const navigate = useNavigate();
   const { showSuccess, showError } = useNotifications();
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
-  const handleFormSubmit = async (data) => {
+  const handleFormSubmit = async (data, newFiles) => {
     try {
       const payload = {
         title: data.title,
@@ -34,12 +36,21 @@ const AddProperty = () => {
 
       const newProp = await propertyService.createProperty(payload);
 
-      // Handle Image Upload
-      if (data.imageFile && data.imageFile.length > 0 && newProp?.id) {
-        const file = data.imageFile[0];
-        const img = await propertyService.uploadImage(newProp.id, file);
-        if (img?.id) {
-          await propertyService.setCoverImage(newProp.id, img.id);
+      // Handle Multiple Image Uploads Sequentially
+      if (newFiles && newFiles.length > 0 && newProp?.id) {
+        setIsUploading(true);
+        setUploadProgress(0);
+        
+        let completed = 0;
+        for (let i = 0; i < newFiles.length; i++) {
+          const file = newFiles[i];
+          await propertyService.uploadImage(newProp.id, file, (percent) => {
+            const currentContribution = percent / newFiles.length;
+            const overallPercent = Math.round(((completed / newFiles.length) * 100) + currentContribution);
+            setUploadProgress(overallPercent);
+          });
+          completed++;
+          setUploadProgress(Math.round((completed / newFiles.length) * 100));
         }
       }
 
@@ -48,6 +59,8 @@ const AddProperty = () => {
     } catch (err) {
       const backendMessage = err?.response?.data?.message;
       showError(backendMessage || 'Failed to publish property.');
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -63,6 +76,8 @@ const AddProperty = () => {
           onSubmit={handleFormSubmit}
           submitLabel="Publish Property"
           onCancel={() => navigate('/dashboard')}
+          uploadProgress={uploadProgress}
+          isUploading={isUploading}
         />
       </div>
     </div>

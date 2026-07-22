@@ -27,7 +27,7 @@ const schema = yup.object().shape({
   agent_email: yup.string().nullable().notRequired()
 });
 
-const PropertyForm = ({ initialData, onSubmit, submitLabel = 'Save Listing', onCancel }) => {
+const PropertyForm = ({ initialData, onSubmit, submitLabel = 'Save Listing', onCancel, uploadProgress = 0, isUploading = false }) => {
   const [propertyTypes, setPropertyTypes] = useState([]);
   const [countries, setCountries] = useState([]);
   const [states, setStates] = useState([]);
@@ -38,6 +38,11 @@ const PropertyForm = ({ initialData, onSubmit, submitLabel = 'Save Listing', onC
 
   const [selectedCountry, setSelectedCountry] = useState('');
   const [selectedState, setSelectedState] = useState('');
+
+  // Image Upload states
+  const [newFiles, setNewFiles] = useState([]); // Array of { id, file, preview }
+  const [existingImages, setExistingImages] = useState([]);
+  const [dragActive, setDragActive] = useState(false);
 
   const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm({
     resolver: yupResolver(schema),
@@ -68,6 +73,7 @@ const PropertyForm = ({ initialData, onSubmit, submitLabel = 'Save Listing', onC
 
         if (initialData) {
           reset(initialData);
+          setExistingImages(initialData.images || []);
           if (initialData.city?.state) {
             setSelectedState(initialData.city.state.id);
             if (initialData.city.state.country_id) {
@@ -139,10 +145,89 @@ const PropertyForm = ({ initialData, onSubmit, submitLabel = 'Save Listing', onC
     loadCities();
   }, [selectedState, isInitialized, setValue]);
 
+  // Cleanup object URLs to avoid memory leaks
+  useEffect(() => {
+    return () => {
+      newFiles.forEach(fileObj => URL.revokeObjectURL(fileObj.preview));
+    };
+  }, []);
+
+  const validateAndAddFiles = (filesList) => {
+    const validFiles = [];
+    const maxLimit = 5 * 1024 * 1024; // 5MB
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+
+    for (let file of filesList) {
+      if (!allowedTypes.includes(file.type)) {
+        alert(`File "${file.name}" is not an accepted format (JPG, PNG, WEBP only).`);
+        continue;
+      }
+      if (file.size > maxLimit) {
+        alert(`File "${file.name}" exceeds the 5MB size limit.`);
+        continue;
+      }
+      
+      const fileId = Math.random().toString(36).substring(2, 9);
+      validFiles.push({
+        id: fileId,
+        file: file,
+        preview: URL.createObjectURL(file)
+      });
+    }
+
+    if (validFiles.length > 0) {
+      setNewFiles(prev => [...prev, ...validFiles]);
+    }
+  };
+
+  const handleRemoveNewFile = (id) => {
+    setNewFiles(prev => {
+      const target = prev.find(item => item.id === id);
+      if (target) URL.revokeObjectURL(target.preview);
+      return prev.filter(item => item.id !== id);
+    });
+  };
+
+  const handleRemoveExistingImage = async (imageId) => {
+    if (window.confirm('Are you sure you want to permanently delete this photo from the listing?')) {
+      try {
+        await propertyService.deleteImage(imageId);
+        setExistingImages(prev => prev.filter(img => img.id !== imageId));
+      } catch (err) {
+        alert('Failed to delete image. Please try again.');
+      }
+    }
+  };
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      validateAndAddFiles(e.dataTransfer.files);
+    }
+  };
+
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      validateAndAddFiles(e.target.files);
+    }
+  };
+
   const handleFormSubmit = async (data) => {
     setLoading(true);
     try {
-      await onSubmit(data);
+      await onSubmit(data, newFiles.map(f => f.file));
     } catch (e) {
       console.error(e);
     } finally {
@@ -285,10 +370,115 @@ const PropertyForm = ({ initialData, onSubmit, submitLabel = 'Save Listing', onC
         </div>
       </div>
 
-      {/* Cover Image Uploader */}
-      <div className="space-y-1">
-        <label className="block text-xs font-bold text-slate-500 uppercase">Photo Upload</label>
-        <input type="file" {...register('imageFile')} className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
+      {/* Property Photo Upload Section */}
+      <div className="space-y-4">
+        <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Property Photos</label>
+        
+        {/* Drag and Drop Zone */}
+        <div
+          onDragEnter={handleDrag}
+          onDragOver={handleDrag}
+          onDragLeave={handleDrag}
+          onDrop={handleDrop}
+          className={`relative border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center gap-3 transition-all cursor-pointer ${
+            dragActive 
+              ? 'border-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/20' 
+              : 'border-slate-300 bg-slate-50 hover:bg-slate-100/50 dark:border-slate-800 dark:bg-slate-900/50 dark:hover:bg-slate-900'
+          }`}
+          onClick={() => document.getElementById('photo-upload-input').click()}
+        >
+          <input
+            id="photo-upload-input"
+            type="file"
+            multiple
+            accept=".jpg,.jpeg,.png,.webp"
+            onChange={handleFileChange}
+            className="hidden"
+          />
+          <div className="p-4 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 rounded-full">
+            <Upload className="h-6 w-6" />
+          </div>
+          <div className="text-center space-y-1">
+            <p className="text-sm font-bold text-slate-700 dark:text-slate-300">
+              Drag your photos here, or <span className="text-indigo-600 hover:text-indigo-700">browse</span>
+            </p>
+            <p className="text-2xs text-slate-400">Supports JPG, JPEG, PNG, WEBP up to 5MB each</p>
+          </div>
+        </div>
+
+        {/* Upload Progress Indicator */}
+        {isUploading && (
+          <div className="space-y-1.5 p-4 border border-indigo-150 bg-indigo-50/20 dark:border-indigo-950/40 dark:bg-indigo-950/10 rounded-2xl">
+            <div className="flex justify-between text-xs font-bold text-indigo-700 dark:text-indigo-400">
+              <span>Uploading property images...</span>
+              <span>{uploadProgress}%</span>
+            </div>
+            <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
+              <div 
+                className="bg-indigo-650 h-full rounded-full transition-all duration-300"
+                style={{ width: `${uploadProgress}%` }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Existing Images (Edit Mode) */}
+        {existingImages.length > 0 && (
+          <div className="space-y-2">
+            <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wide">Saved Photos</h4>
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4">
+              {existingImages.map((img) => {
+                const url = img.url.startsWith('http') ? img.url : `http://localhost:8000/${img.url.startsWith('/') ? img.url.substring(1) : img.url}`;
+                return (
+                  <div key={img.id} className="relative aspect-4/3 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 group shadow-sm bg-slate-100">
+                    <img src={url} alt="Saved Property" className="w-full h-full object-cover" />
+                    {img.is_cover && (
+                      <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider bg-indigo-650 text-white rounded-md shadow-sm">
+                        Cover
+                      </span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveExistingImage(img.id);
+                      }}
+                      className="absolute top-1.5 right-1.5 p-1 bg-rose-600 text-white rounded-lg hover:bg-rose-700 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-xs"
+                      title="Delete photo"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* New Selected Images Preview */}
+        {newFiles.length > 0 && (
+          <div className="space-y-2">
+            <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wide">New Selected Photos</h4>
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4">
+              {newFiles.map((fileObj) => (
+                <div key={fileObj.id} className="relative aspect-4/3 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 group shadow-sm bg-slate-100">
+                  <img src={fileObj.preview} alt="Selected Preview" className="w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveNewFile(fileObj.id);
+                    }}
+                    className="absolute top-1.5 right-1.5 p-1 bg-slate-800 hover:bg-slate-900 text-white rounded-lg shadow-sm opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-xs"
+                    title="Remove selection"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Amenities Grid */}
